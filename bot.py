@@ -9,31 +9,34 @@ pastebin_key = xyzzy
 pastebin_user_key = xyzzy 
 Block_number = 0
 transaction_number = 00000
-Transactions = {}
-Transacted = {}
-Balances = {}
+Transactions = []
+Transacted = []
+Balances = []
+Users = []
 most_recent = 0
 last_timestamp = 0
+coinbot_id = 0
 
 #class for transactions
-Class Transaction:
-	def __init__(self, user1, user2, amount)
-		self = transaction_number
-		user1 = uuid1
-		user2 = uuid2
-		amount = paid
+class Transaction:
+	def __init__(self, transaction, uuid1, uuid2, amount):
+        global transaction_number
+		self.transaction = transaction_number
+		self.uuid1 = uuid1
+		self.uuid2 = uuid2
+		self.amount = amount
 
 #define object class for user profiles
-Class User:
-	def __init__(uuid, blog_url, balance) 
+class User:
+	def __init__(self, uuid, blog_url, balance): 
 		uuid = tumblelog_uuid
 		blog_url = url
 		balance = 0
 
 #define object class for blocks
-Class Block:
-	def__init__(block_number, transaction_list, updated_balances, timestamp, hash, exchange rate, message)
-		block_number = block_number
+class Block:
+	def __init__(self, block_number, transaction_list, updated_balances, timestamp, hash, exchange rate, message):
+		self.block_number = block_number
 		transaction_list = transaction_list
 		updated_balances = updated_balances
 		timestamp = timestamp
@@ -42,7 +45,7 @@ Class Block:
 		message: "Have a BlogCoin day!"
 
 #retrieve block 1 info from post
-Def get_block_one
+def get_block_one():
 	URL = "api.tumblr.com/v2/blog/coinbot9000.tumblr.com/posts/?api_key={key}&tag=blockchain"
 	parameters = {}
 	r = requests.get(url = URL, params = parameters)
@@ -51,16 +54,16 @@ Def get_block_one
 	URL = "api.tumblr.com/v2/blog/coinbot9000.tumblr.com/posts/"
 	URL = (URL + Masterpost_id)
 	parameters = {}
-	R = requests.get(url = URL, params = parameters) 
+	r = requests.get(url = URL, params = parameters) 
 	data = r.json()
-	Masterpost_id = data["response"]["posts"[0][post_id] 
-	Coinbot_id = tumblelog_uuid, 
+	Masterpost_id = data["response"]["posts"[0]['post_id'] 
+	global coinbot_id = data["response"]["posts"][0][tumblelog_uuid]
 	first_reblog(Masterpost_id)
 
 #getting transactions
-Def find_transactions
+def find_transactions():
 	URL = "https://api.tumblr.com/v2/tagged?tag=BlogCoin_transaction"
-	parameters = {}
+	parameters = []
 	r = requests.get(url = URL, params = parameters)
 	data = r.json()	
 	for I in data["response"]["posts"]:
@@ -75,13 +78,13 @@ Def find_transactions
 		data2 = r.json()
 		transaction_text = data2["response"]["posts"][I][content]
 		transaction_uuid = data2["response"]["posts"][I][tumblelog_uuid]
-		parse_transaction
+		parse_transaction()
 		if parse = fail:
 			return
-		process_transaction
+		process_transaction()
 
 #transactions should be phrased as "[user1] [X] [user2]"
-Def parse_transaction
+def parse_transaction():
 	transaction_text_list = transaction_text.split(" ", 3)
 	if transaction_uuid in Users:
 		if transaction_uuid.blog_url != transaction_url:
@@ -91,7 +94,7 @@ Def parse_transaction
 		return
 	if transaction_text_list[0] != transaction_url:
 		parse = fail
-		fail message = "You're trying to transfer BlogCoin from a url other than your own. Don't make me tap the "not your keys, not your crypto" sign.
+		fail_message = "You're trying to transfer BlogCoin from a url other than your own. Don't make me tap the 'not your keys, not your crypto' sign."
 		return
 	else:
 		uuid1 = transaction_uuid
@@ -180,7 +183,7 @@ Def parse_transaction
 		user2 = data4["response"]["posts"][tumblelog_uuid]
 		Users.append(uuid2, transaction_text_list[2], 0)
 
-Def process_transaction
+def process_transaction(uuid1, uuid2, amount):
 	transaction_number = Transaction(transaction_number, uuid1, uuid2, amount)
 	Transactions.append(transaction_number)
 	uuid1.balance = uuid1.balance - amount
@@ -192,21 +195,21 @@ Def process_transaction
 		Transacted.append(uuid2)
 
 #define function to find first reblog of a given reblog, with most_recent as a prerequisite variable. (Each new block's post id will be designated as most_recent once it's made.) From there, can grab first_reblog[added_text] for the hash, etc.
-def first_reblog(post_id)
+def first_reblog(post_id):
 	URL = "api.tumblr.com/v2/blog/coinbot9000/notifications"
-	parameters = {'types':reblog_with_content}
+	parameters = {'types':'reblog_with_content'}
 	r = requests.get(url = URL, params = parameters)
 	data = r.json()
 	smol_timestamp = 1660509760000
 	for i in data["response"]["notifications"]:
-		if data["response"]["notifications"][I][target_post_id] = post_id:
-			if data["response"]["notifications"][i][timestamp] = smol_timestamp:
-				number = random.randint(0,1)
-				if number = 0:
+		if data["response"]["notifications"][I]['target_post_id'] == post_id:
+			if data["response"]["notifications"][i][timestamp] == smol_timestamp:
+				number == random.randint(0,1)
+				if number == 0:
 					smol_timestamp = data["response"]["notifications"][i][timestamp]
 				else:
 					continue
-			elif data["response"]["notifications"][i][timestamp] < smol_timestamp:
+			elif data["response"]["notifications"][i]['timestamp'] < smol_timestamp:
 				smol_timestamp = data["response"]["notifications"][i][timestamp]
 				mined_block = data["response"]["notifications"][I][post_id]
 				blog_url = data["response"]["notifications"][I][from_tumblelog_name]
@@ -215,26 +218,26 @@ def first_reblog(post_id)
 				continue
 		else:
 			continue
-	if smol_timestamp = 1660509760000:
-		mined_block = none
+	if smol_timestamp == 1660509760000:
+		mined_block = None
 		break
 	else:
-		find_block(mined_block)
+		find_block(mined_block, blog_url, mine_content)
 
 #define function to find existing coinbot block from mined block
-Def find_block(post_id)
+def find_block(post_id, url, content):
 	URL = "api.tumblr.com/v2/blog/"
-	URL = (URL + blog_url + "/notes?id=" + post_id + "&mode=reblogs_with_tags")
+	URL = (URL + url + "/notes?id=" + post_id + "&mode=reblogs_with_tags")
 	parameters = {}
-	R = requests.get(url = URL, params = parameters) 
+	r = requests.get(url = URL, params = parameters) 
 	data = r.json()	
 	next_block = 0
-	post_ids = {}
+	post_ids = []
 	for i in data["response"][notes]:
-		if data["response"][notes][I][blog_uuid] = coinbot_id:
-			if tags contains "valid block":
-				if: next_block != 0:
-					post_ids.append(data["response"][notes][I])
+		if data["response"][notes][i][blog_uuid] == global coinbot_id:
+			if "valid block" in data["response"][notes][i]['tags']:
+				if next_block != 0:
+					post_ids.append(data["response"][notes][i])
 				else:
 					next_block = data["response"][notes][I][post_id]
 					post_ids.append(next_block)
@@ -246,23 +249,23 @@ Def find_block(post_id)
 		api_endpoint = api.tumblr.com/v2/blog/coinbot9000.tumblr.com/posts
 		api_key = key
 		data = {'content':{{"type":"text", "text":"A fork has occurred. Please help. Coinbot is scared."}},
-			'tags':[help,Dave,my mind is going,I can feel it]
+			'tags':['help, Dave, my mind is going, I can feel it']
 			}
 		r = requests.post(url = api_endpoint, data = data)
 		response = r.text
 		sys.exit(0)
 	elif next_block = 0:
-		reblog(mined_block)
+		reblog(post_id, content)
 	else:
 		first_reblog(next_block)
 
 #define hash function
-Def hash(mine_content)
+def hash(mine_content):
 	hash_content = (mine_content + timestamp_text)
 	hash_content = hash(hash_content)
 
 #block mining rewards
-Def get_reward
+def get_reward():
 	If block_number > 1000:
 		MineReward = 0
 	Elif block_number > 500:
@@ -273,11 +276,11 @@ Def get_reward
 		MineReward = 1
 
 #define function to compute exchange rate:
-Def compute_exchange:	
+def compute_exchange():
 	exchange = random.randrange(1000000000, 10000000000, 3)
 
 #create balance list:
-Def balance_list
+def balance_list():
 	for i in Transacted:
 		str_balance = str(i.balance)
 		trans = str(i.blog_url, ": ", str.balance, " BlC. ")
@@ -287,45 +290,45 @@ Def balance_list
 		balances_string = balances_string + i
 
 #transaction text
-Def text_transactions
+def text_transactions():
 	Transactions_text = {}
 	for i in Transactions:
 		transaction_txt = str(uuid1.blog_url + " sends " + amount + "to " uuid2.blog_url + ". ")
 		transactions_text.append(transaction_txt)
 
 #generate post
-Def generate_block_content
-	get_reward
+def generate_block_content():
+	get_reward()
 	if parent_tumblelog_uuid not in Users:
-		parent_tumblelog_uuid = User(parent_tumblelog_uuid, blog_url, 0)
+		parent_tumblelog_uuid = User(self, parent_tumblelog_uuid, blog_url, 0)
 		Users.append(parent_tumblelog_uuid)
 	if parent_tumblelog_uuid not in Transacted:
 		Transacted.append(parent_tumblelog_uuid)
-	transaction_number = Transaction(transaction_number, coinbot_id, parent_tumblelog_uuid, MineReward)
-	Transactions.append(transaction_number)
+	transactions.append(Transaction(transaction_number, coinbot_id, parent_tumblelog_uuid, MineReward))
 	Coinbot.balance = Coinbot.balance - transaction_number.amount
 	parent_tumblelog_uuid.balance = parent_tumblelog_uuid.balance + transaction_number.amount
 	transaction_number = transaction_number + 1
 	number_text = "Block number: " + str(block_number))
-	text_transactions
+	text_transactions()
 	transaction_text = Transactions_text
-	balances_text = balances_string
+	balances_text = balance_list()
 	timestamp_text = datetime.datetime.(now)
-	hash_text = hash(mine_content + timestamp_text)
-	exchange_text = compute_exchange
+	hash_text = hash(content + timestamp_text)
+	exchange_text = compute_exchange()
 	message_text = "Have a BlogCoin day!"
-	block_number = Block(block_number, transaction_list, updated_balances, timestamp, hash, exchange rate, message)
+	blocks.append(Block(block_number, transaction_list, updated_balances, timestamp, hash, exchange rate, message))
 	post_content = [{"type": "text", "text": number_text}, {"type": "text", "text": transaction_text}, {"type": "text", "text": balances_text}, {"type": "text", "text": timestamp_text}, {"type": "text", "text": hash_text}, {"type": "text", "text": exchange_text}, {"type": "text", "text": message_text}]
+    return post_content
 
 #define function to reblog & add new block
-Def reblog(post_id)
+def reblog(post_id, content):
 	URL = api.tumblr.com/v2/blog/
 	URL = (URL + blog_url + "/posts/" + post_id)
 	r = requests.get(url = URL, params = parameters)
 	data = r.json()
-	reblog_key = data["response"]["posts"][0][reblog_key]
+	reblog_key = data["response"]["posts"][0]['reblog_key']
 	parent_tumblelog_uuid = data["response"]["posts"][0][parent_tumblelog_uuid]
-	generate_block_content
+	post_content = generate_block_content(parent_tumblelog_uuid, content)
 	api_endpoint = api.tumblr.com/v2/blog/
 	api_endpoint = (api_endpoint + blog_url + "/post/reblog")
 	data = {'content':post_content]
@@ -339,32 +342,32 @@ Def reblog(post_id)
 	#ERROR HANDLING
 	if new_requests['results'][meta][status] = 201:
 		new_requests['results'][response][id] = most_recent
-	elif new_requests['results'][meta][status] = 400 and new_requests['results'][errors][code] = 8002:
+	elif new_requests['results'][meta][status] = 400 and new_requests['results'][errors][code] == 8002:
 		#add blog_url to a list of failed reblogs
 		#find the earliest reblog that works and reblog that
 		#post a comment to the first reblog saying there was an error?
 	elif new_requests['results'][meta][status] = 404:
 		#note to user in next block re: post id and blog itself
-	elif new_requests['results'][meta][status] = 500 or new_requests['results'][meta][status] = 503:
+	elif new_requests['results'][meta][status] = 500 or new_requests['results'][meta][status] == 503:
 		#wait an hour and try again?
-	elif new_requests['results'][meta][status] = 403 and new_requests['results'][errors][code] = 8023:
+	elif new_requests['results'][meta][status] = 403 and new_requests['results'][errors][code] == 8023:
 		#wait 24 hours and try again. Maybe post saying Coinbot needs to sleep, or something.
 	elif new_requests['results'][meta][status] = 401:
 		#something with the API key?
 	else: 
 		#write it to a pastebin and pause. It'll send me a notification and I'll look at it.
 	#WRITE TO PASTEBIN AS BACKUP
-	after_reblog
+	after_reblog(timestamp_text)
 
-Def after_reblog
-	Transactions = {}
-	Transacted = {}
-	Balances = {}
+def after_reblog(timestamp_text):
+	global Transactions = []
+	global Transacted = []
+	global Balances = []
 	last_timestamp = int(timestamp_text)
 	block_number = block_number + 1
 
 #pasting block info after reblogging
-Def paste_block
+def paste_block():
 	block_paste_content = content + other info
 	api_endpoint = https://pastebin.com/api/api_post.php
 	pastebin_key = api key
@@ -383,7 +386,7 @@ Def paste_block
 	#if an error occurs that prevents Coinbot from reblogging a mined block, then it defaults to the second reblog and adds a note tagging the user, saying that the user tried to reblog Coinbot's block but Coinbot got an [insert error] message indicating that [thing happened]. 
 
 #post the text stored in the transaction_list variable to Pastebin
-Def paste_transactions(Transactions)	
+def paste_transactions(Transactions):	
 	api_endpoint = https://pastebin.com/api/api_post.php
 	pastebin_key = api key
 	Coinbot_user_key = pastebin_user_key
@@ -400,7 +403,7 @@ Def paste_transactions(Transactions)
 	Transactions = {}
 
 #define function for the bot to find its way through the thread to the most recent valid block of the chain (if it crashes, for example)
-def restart_thread
+def restart_thread():
 	URL = "api.tumblr.com/v2/blog/coinbot9000/posts/?api_key={key}&tag=valid_block"
 	parameters = {}
 	r = requests.get(url = URL, params = parameters)
@@ -420,12 +423,12 @@ def restart_thread
 	first_reblog(next_block)
 
 #initializing functions
-get_block_one
+get_block_one()
 Users = {}
 coinbot_id = User(coinbot_id, Coinbot9000, 1000)
 Users.append(coinbot_id)
 
 #main loop
-find_transactions
-first_reblog
+find_transactions()
+first_reblog()
 #wait 15 mins?
